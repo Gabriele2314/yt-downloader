@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentVideoUrl = '';
     let selectedQuality = '1080';
 
-    // COBALT API CONFIG
-    const COBALT_API = 'https://api.cobalt.tools';
+    // BACKEND API CONFIG
+    const BACKEND_API = 'http://localhost:3000/api';
 
     // Extract YouTube video ID from URL
     function extractVideoId(url) {
@@ -105,65 +105,47 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Handle download via Cobalt API
+    // Handle download via Local Backend API
     downloadBtn.addEventListener('click', async () => {
         if (!currentVideoUrl) return;
 
-        const selectedCodec = document.querySelector('input[name="codec"]:checked').value;
+        // Map quality
+        let backendQuality = '1080p';
+        if (selectedQuality === '2160') backendQuality = '4k';
+        if (selectedQuality === '1440') backendQuality = '1440p';
+        if (selectedQuality === '1080') backendQuality = '1080p';
+        if (selectedQuality === '720') backendQuality = '720p';
 
         setLoading(downloadBtn, downloadBtnText, downloadLoader, true, downloadBtnIcon);
-        showStatus('⏳ Elaborazione in corso tramite Cobalt... Potrebbe richiedere qualche secondo.', 'info');
+        showStatus('⏳ Il tuo server locale sta scaricando e unendo il video (ffmpeg). Potrebbe richiedere qualche minuto per i video in 4K...', 'info');
 
         try {
-            const response = await fetch(COBALT_API, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    url: currentVideoUrl,
-                    videoQuality: selectedQuality,
-                    youtubeVideoCodec: selectedCodec,
-                    filenameStyle: 'pretty',
-                    downloadMode: 'auto',
-                }),
-            });
-
-            const data = await response.json();
-
-            if (data.status === 'redirect' || data.status === 'tunnel') {
-                showStatus('✅ Download pronto! Il file si sta scaricando...', 'success');
-                // Open the download URL
-                window.open(data.url, '_blank');
-            } else if (data.status === 'picker') {
-                // Multiple streams available, use the first video one
-                if (data.picker && data.picker.length > 0) {
-                    showStatus('✅ Download pronto!', 'success');
-                    window.open(data.picker[0].url, '_blank');
-                } else {
-                    throw new Error('Nessun formato disponibile.');
-                }
-            } else if (data.status === 'error') {
-                throw new Error(data.error?.code || 'Errore dal server Cobalt.');
-            } else {
-                throw new Error('Risposta inattesa dal server.');
+            // Check if server is running
+            try {
+                await fetch('http://localhost:3000/api/info?url=https://youtube.com', { method: 'HEAD', mode: 'no-cors' });
+            } catch (e) {
+                throw new Error("Il server locale non è in esecuzione. Avvia 'node server.js' nel terminale.");
             }
+
+            const downloadUrl = `${BACKEND_API}/download?url=${encodeURIComponent(currentVideoUrl)}&quality=${backendQuality}`;
+            
+            // Create a hidden link to trigger the download
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            
+            // Assume the download prompt appeared after a short timeout
+            setTimeout(() => {
+                document.body.removeChild(a);
+                showStatus('✅ Download avviato! Controlla i tuoi download.', 'success');
+                setLoading(downloadBtn, downloadBtnText, downloadLoader, false, downloadBtnIcon);
+            }, 3000);
 
         } catch (err) {
             console.error('Download error:', err);
-
-            if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-                showStatus(
-                    '⚠️ Il server Cobalt non è raggiungibile dal browser (CORS). ' +
-                    'Puoi usare <a href="https://cobalt.tools" target="_blank" style="color: inherit; text-decoration: underline;">cobalt.tools</a> direttamente, ' +
-                    'oppure esegui il sito in locale con Node.js per un\'esperienza completa.',
-                    'error'
-                );
-            } else {
-                showStatus(`❌ Errore: ${err.message}`, 'error');
-            }
-        } finally {
+            showStatus(`❌ Errore: ${err.message}`, 'error');
             setLoading(downloadBtn, downloadBtnText, downloadLoader, false, downloadBtnIcon);
         }
     });

@@ -17,27 +17,29 @@ Scarica video da YouTube fino alla risoluzione **4K HDR 60fps** con un'interfacc
 - ⚡ Selezione qualità: 4K / 1440p / 1080p / 720p
 - 🔧 Scelta codec: H.264, VP9, AV1
 - 📱 Design responsive per ogni dispositivo
-- 🚀 Funziona interamente nel browser — nessun backend necessario
+- 🚀 **Architettura Ibrida**: Usa la comodità del sito pubblico su GitHub Pages, ma sfrutta la potenza del tuo computer (in locale) per scaricare e unire i video tramite `yt-dlp` e `ffmpeg`, aggirando blocchi e limitazioni API.
 
 ## ⚙️ Come funziona
 
-1. Incolli il link del video YouTube
-2. Clicchi **Analizza** per vedere titolo e anteprima
-3. Scegli qualità e codec
-4. Clicchi **Scarica Video** — il download viene gestito tramite l'API di [Cobalt](https://cobalt.tools)
+1. **Avvia il server in locale:** Per funzionare, il sito ha bisogno del backend Node.js in esecuzione sul tuo Mac. Questo permette di gestire `yt-dlp` in locale per la massima qualità.
+2. Incolli il link del video YouTube sull'interfaccia.
+3. Selezioni la qualità desiderata (fino a 4K).
+4. Il frontend web comunica con il tuo server locale `localhost:3000`, che scaricherà i flussi, li unirà con `ffmpeg` in un unico file MP4, e avvierà il download nel tuo browser.
 
-## 🛠 Eseguire in locale
+## 🛠 Istruzioni d'uso
 
 ```bash
+# Assicurati di aver clonato la repo e installato le dipendenze
 git clone https://github.com/Gabriele2314/yt-downloader.git
 cd yt-downloader
+npm install
 
-# Apri direttamente nel browser
-open index.html
-
-# Oppure con un server locale
-npx serve .
+# 1. Avvia il server backend in locale (lascia questa finestra aperta)
+node server.js
 ```
+
+**2. Apri il sito pubblico:**
+Vai su **[https://gabriele2314.github.io/yt-downloader/](https://gabriele2314.github.io/yt-downloader/)** e inizia a scaricare!
 
 ## 📁 Struttura del progetto
 
