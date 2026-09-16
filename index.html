@@ -3,138 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YT Downloader PRO — Scarica video YouTube in 4K</title>
-    <meta name="description" content="Scarica video da YouTube fino in 4K HDR 60fps gratuitamente. Nessuna installazione richiesta.">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="styles.css">
+    <title>Avvia YT Downloader PRO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #080c14;
+            color: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+            text-align: center;
+        }
+        .container {
+            background: rgba(16, 24, 40, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            max-width: 600px;
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.6);
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #f1f5f9 30%, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+        }
+        .terminal {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1rem;
+            font-family: monospace;
+            color: #10b981;
+            text-align: left;
+            overflow-x: auto;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .btn {
+            background: #6366f1;
+            color: white;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        .btn:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+        }
+        .loader {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-top: 1rem;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        #status {
+            margin-top: 1.5rem;
+            font-weight: 600;
+        }
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
-    <div class="background">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
+
+    <div class="container">
+        <h1>Connessione a YT Downloader...</h1>
+        <div id="loading">
+            <p>Sto cercando il tuo server locale in esecuzione...</p>
+            <div class="loader"></div>
+        </div>
+
+        <div id="error-box" class="hidden">
+            <p><strong>Server locale non trovato.</strong></p>
+            <p>Per aggirare i blocchi dei browser e scaricare in massima qualità (4K HDR), l'interfaccia deve girare direttamente sul tuo Mac.</p>
+            <p>Apri il Terminale sul tuo Mac e incolla questi comandi:</p>
+            <div class="terminal">
+                cd /Users/ospite/.gemini/antigravity-ide/scratch/yt-downloader<br>
+                node server.js
+            </div>
+            <p>Una volta fatto, clicca qui sotto per aprire il tool:</p>
+            <a href="http://localhost:3000" class="btn">Apri YT Downloader PRO</a>
+        </div>
     </div>
 
-    <main class="container">
-        <header>
-            <div class="logo">
-                <div class="logo-icon">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-                        <path d="M21.582 6.186a2.506 2.506 0 0 0-1.762-1.766C18.265 4 12 4 12 4s-6.264 0-7.819.42a2.506 2.506 0 0 0-1.763 1.766C2 7.74 2 12 2 12s0 4.26.418 5.814a2.506 2.506 0 0 0 1.763 1.766C5.736 20 12 20 12 20s6.265 0 7.82-.42a2.506 2.506 0 0 0 1.762-1.766C22 16.26 22 12 22 12s0-4.26-.418-5.814z" fill="#FF0000"/>
-                        <path d="M10 15l5-3-5-3v6z" fill="#FFFFFF"/>
-                    </svg>
-                </div>
-                <h1>YT Downloader <span class="badge">PRO</span></h1>
-            </div>
-            <p class="subtitle">Scarica i tuoi video preferiti nella massima qualità possibile, fino a <strong>4K HDR 60fps</strong></p>
-        </header>
+    <script>
+        // Prova a connettersi al server locale
+        async function checkServer() {
+            try {
+                // Proviamo a fare una fetch. Se il server è online, la porta 3000 risponderà.
+                const res = await fetch('http://localhost:3000/api/info?url=https://youtube.com', { 
+                    method: 'HEAD', 
+                    mode: 'no-cors' 
+                });
+                // Se non lancia eccezioni, il server è molto probabilmente online.
+                // Facciamo il redirect istantaneo a localhost
+                window.location.href = "http://localhost:3000";
+            } catch (err) {
+                // Server non raggiungibile
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error-box').classList.remove('hidden');
+            }
+        }
 
-        <section class="input-section glass-panel">
-            <div class="input-group">
-                <div class="input-wrapper">
-                    <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-                    </svg>
-                    <input type="url" id="videoUrl" placeholder="Incolla qui il link di YouTube..." required>
-                </div>
-                <button id="fetchBtn" class="btn-primary">
-                    <span class="btn-text">Analizza</span>
-                    <span class="loader hidden"></span>
-                </button>
-            </div>
-            <div id="errorMsg" class="error-msg hidden"></div>
-        </section>
-
-        <section id="resultSection" class="result-section glass-panel hidden">
-            <div class="video-info">
-                <div class="thumbnail-wrapper">
-                    <img id="thumbnail" src="" alt="Thumbnail del video" class="thumbnail">
-                    <div class="play-overlay">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                    </div>
-                </div>
-                <div class="details">
-                    <h2 id="videoTitle">Titolo del Video</h2>
-                    <div class="meta-row">
-                        <span class="meta-badge" id="videoAuthor">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            Autore
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="download-options">
-                <h3>Scegli la qualità:</h3>
-                <div class="quality-grid">
-                    <button class="quality-btn" data-quality="2160">
-                        <div class="quality-icon">🎬</div>
-                        <div class="quality-text">
-                            <div class="quality-label">4K Ultra HD</div>
-                            <div class="quality-desc">2160p · Massima qualità</div>
-                        </div>
-                    </button>
-                    <button class="quality-btn" data-quality="1440">
-                        <div class="quality-icon">🖥️</div>
-                        <div class="quality-text">
-                            <div class="quality-label">1440p QHD</div>
-                            <div class="quality-desc">Ottima qualità</div>
-                        </div>
-                    </button>
-                    <button class="quality-btn active" data-quality="1080">
-                        <div class="quality-icon">📺</div>
-                        <div class="quality-text">
-                            <div class="quality-label">1080p Full HD</div>
-                            <div class="quality-desc">Consigliato</div>
-                        </div>
-                    </button>
-                    <button class="quality-btn" data-quality="720">
-                        <div class="quality-icon">📱</div>
-                        <div class="quality-text">
-                            <div class="quality-label">720p HD</div>
-                            <div class="quality-desc">Download veloce</div>
-                        </div>
-                    </button>
-                </div>
-
-                <div class="codec-selector">
-                    <label class="codec-option">
-                        <input type="radio" name="codec" value="h264" checked>
-                        <span class="codec-label">H.264 <small>(compatibile ovunque)</small></span>
-                    </label>
-                    <label class="codec-option">
-                        <input type="radio" name="codec" value="vp9">
-                        <span class="codec-label">VP9 <small>(migliore per 4K)</small></span>
-                    </label>
-                    <label class="codec-option">
-                        <input type="radio" name="codec" value="av1">
-                        <span class="codec-label">AV1 <small>(massima efficienza)</small></span>
-                    </label>
-                </div>
-
-                <button id="downloadBtn" class="btn-download">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                    <span class="btn-text">Scarica Video</span>
-                    <span class="loader hidden"></span>
-                </button>
-            </div>
-            <div id="downloadStatus" class="status-msg hidden"></div>
-        </section>
-
-        <footer>
-            <p>Powered by <a href="https://cobalt.tools" target="_blank" rel="noopener">cobalt</a> · Open Source</p>
-        </footer>
-    </main>
-
-    <script src="script.js"></script>
+        // Ritardo di 1 secondo per non farlo sembrare un glitch
+        setTimeout(checkServer, 1000);
+    </script>
 </body>
 </html>
